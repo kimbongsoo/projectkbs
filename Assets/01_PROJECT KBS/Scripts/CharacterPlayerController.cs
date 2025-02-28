@@ -27,19 +27,36 @@ public class CharacterPlayerController : MonoBehaviour
             Destroy(collision.gameObject);
         }
     }
+
+    // public void OnTriggerStay(Collider other)
+    // {
+    //     if (other.gameObject.CompareTag("Player"))
+    //     {
+    //         Debug.Log("OnCollisionStay!!! :" + other.gameObject.name);
+    //     }
+    // // }
+    private void OnTriggerStay(Collider other)
+    {
+        Vector3 ballPosition = transform.position + new Vector3(0,5,0);
+        Debug.Log("OnTriggerStay :" + other.gameObject.name);
+        Debug.Log("공 생성 위치: " + ballPosition);
+        GameObject newCopyBall = Instantiate(originalBall, ballPosition, Quaternion.identity);
+        newCopyBall.SetActive(true);
+
+    }
     private void Update()
     {
         if (Input.GetMouseButtonDown(0))
         {
             SetCursorVisible(false);
         }
-
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            //TODO : 복제 생성
-            GameObject newCopyVall = Instantiate(originalBall, transform.position, Quaternion.identity);
-            newCopyVall.SetActive(true);
-        }
+        
+        // if (Input.GetKeyDown(KeyCode.Space))
+        // {
+        //     //TODO : 복제 생성
+        //     GameObject newCopyBall = Instantiate(originalBall, transform.position, Quaternion.identity);
+        //     newCopyBall.SetActive(true);
+        // }
 
         float horizontal = Input.GetAxis("Horizontal");     //Input.GetAxis ("Horizontal") : A,D Key 또는 Keyboard Left/Right Arrow Key
         float vertical = Input.GetAxis("Vertical");         //Input.GetAxis ("Vertical") : W, S Key 또는 Keyboard Up/Down Arrow Key

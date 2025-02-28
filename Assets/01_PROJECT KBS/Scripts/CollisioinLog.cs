@@ -22,7 +22,7 @@ public class CollisioinLog : MonoBehaviour
     }
     private void OnTriggerStay(Collider other)
     {
-        Debug.Log("OnTriggerStay :" + other.gameObject.name);
+        // Debug.Log("OnTriggerStay :" + other.gameObject.name);
     }
     private void OnTriggerExit(Collider other)
     {
