@@ -8,6 +8,10 @@ public class CharacterPlayerController : MonoBehaviour
     public float rotationSpeed = 180f;
     public GameObject originalBall;
 
+    public Animator characterAnimator;
+
+    public bool isCrouching = false;
+
     private void Start()
     {
         SetCursorVisible(false);
@@ -28,12 +32,6 @@ public class CharacterPlayerController : MonoBehaviour
         }
     }
 
-    // public void OnTriggerStay(Collider other)
-    // {
-    //     if (other.gameObject.CompareTag("Player"))
-    //     {
-    //         Debug.Log("OnCollisionStay!!! :" + other.gameObject.name);
-    //     }
     // // }
     private void OnTriggerStay(Collider other)
     {
@@ -57,9 +55,39 @@ public class CharacterPlayerController : MonoBehaviour
         //     GameObject newCopyBall = Instantiate(originalBall, transform.position, Quaternion.identity);
         //     newCopyBall.SetActive(true);
         // }
+        if(Input.GetKey(KeyCode.F))
+        {
+            characterAnimator.SetTrigger("PickUp");
+        }
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            isCrouching = !isCrouching;
+            characterAnimator.SetBool("IsCrouch", isCrouching);
+        }
+        // {
+        //     characterAnimator.SetBool("IsCrouch", true);
+        // }
+        // else
+        // {
+        //     characterAnimator.SetBool("IsCrouch", false);
+        // }
 
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            characterAnimator.SetBool("IsWalk", false);
+        }
+        else
+        {
+            characterAnimator.SetBool("IsWalk", true);
+        }
         float horizontal = Input.GetAxis("Horizontal");     //Input.GetAxis ("Horizontal") : A,D Key 또는 Keyboard Left/Right Arrow Key
         float vertical = Input.GetAxis("Vertical");         //Input.GetAxis ("Vertical") : W, S Key 또는 Keyboard Up/Down Arrow Key
+
+        Vector2 movementInput = new Vector2(horizontal, vertical);
+        characterAnimator.SetFloat("Horizontal", movementInput.x);
+        characterAnimator.SetFloat("Vertical", movementInput.y);
+        characterAnimator.SetFloat("Magnitude", movementInput.magnitude);
+
         Vector3 movement = (transform.right * horizontal) + (transform.forward * vertical);
         this.transform.position += movement * moveSpeed *Time.deltaTime;  //회전을 할 때 곱연산(*)을 사용하는 이유는 Quaternion 같은 회전은 곱셈을 하면 회전이 더 해지는 형태이다
 
