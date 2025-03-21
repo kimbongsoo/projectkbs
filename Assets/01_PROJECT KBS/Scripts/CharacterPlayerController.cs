@@ -1,10 +1,13 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 
 public class CharacterPlayerController : MonoBehaviour
 {
+    [Header("Character Setting")]
     public Animator characterAnimator;
 
     public float moveSpeed = 3.0f;
@@ -15,19 +18,27 @@ public class CharacterPlayerController : MonoBehaviour
     private float blendCrouch = 0f;
     private float blendRunning = 0f;
 
-    // ---------- bullet
+    [Header("Fire Setting")]
     public float force = 1500.0f;
 
     public enum FireMode { SingleShot, Burst, Automatic }
     public FireMode fireMode = FireMode.SingleShot;  
     public float fireRate = 0.2f; 
     private float lastFireTime = 0f;
-    private int burstCount = 0;
-    private float burstDelay = 0.2f;
-    private float burstCoolDown = 0.5f;
 
     public GameObject originalBullet;
 
+    [Header("Camera Setting")]
+    public Transform cameraPivot;
+    public float bottomClampLimit = -80f;
+    public float topClampLimit = 80f;
+    private float threshold = 0.01f;
+    private float targetYaw = 0f;
+    private float targetPitch = 0f;
+
+    [Header("IK Setting")]
+    public Rig aimingRig;
+    public Transform aimingTargetPoint;
 
     private void Start()
     {
@@ -92,21 +103,6 @@ public class CharacterPlayerController : MonoBehaviour
             {
                 Fire();
             }
-            else if (fireMode == FireMode.Burst && Input.GetMouseButton(0) && Time.time >= burstCoolDown)
-            {
-                if (burstCount <3 && Time.time >= lastFireTime + fireRate)
-                {
-                    Fire();
-                    burstCount++;
-                    lastFireTime = Time.time;
-                    // burstCount++;
-                }
-                else
-                {
-                    burstCount = 0;
-                    burstCoolDown = Time.time + burstDelay;
-                }
-            }
             else if (fireMode == FireMode.Automatic && Input.GetMouseButton(0) && Time.time >= lastFireTime + fireRate)
             {
                 Fire();
@@ -127,6 +123,11 @@ public class CharacterPlayerController : MonoBehaviour
             float mouseX = Input.GetAxis("Mouse X");     //Input.GetAxis("Mouse X") : 마우스 X 축 움직임 입력 값
             float rotationY = mouseX * strafeRotationSpeed * Time.deltaTime;      // rotation : 마우스 X 축 움직임 값 * 회전 속도 * Time.deltaTime
             this.transform.rotation *= Quaternion.Euler(0, rotationY, 0); //transform.rotation : 현재 회전값 * Qiaternion.Euler(0, rotation,0)
+
+            Vector3 aimingPoint = CameraSystem.Instance.AimingPoint;
+
+            aimingRig.weight = 1f;
+            aimingTargetPoint.position = aimingPoint;
         }
         else
         {
@@ -140,6 +141,8 @@ public class CharacterPlayerController : MonoBehaviour
             Vector3 movement = forward * movementInput.y + right * movementInput.x;
             transform.position += movement * moveSpeed * Time.deltaTime;
 
+            aimingRig.weight = 0f;
+
             if(movementInput.magnitude > 0f)
             {
                 Quaternion toRotation = Quaternion.LookRotation(movement, Vector3.up);
@@ -147,9 +150,49 @@ public class CharacterPlayerController : MonoBehaviour
             }
         }
     }
+
+    private void LateUpdate()
+    {
+        CameraRotation();
+    }
+
+    public void CameraRotation()
+    {
+        float mouseX = Input.GetAxis("Mouse X");
+        float mouseY = Input.GetAxis("Mouse Y");
+        Vector2 look = new Vector2(mouseX, mouseY);
+
+        if (look.sqrMagnitude > threshold)
+        {
+            float yaw = look.x;
+            float pitch = -look.y;
+
+            targetYaw = ClampAngle(targetYaw + yaw, float.MinValue, float.MaxValue);
+            targetPitch = ClampAngle(targetPitch + pitch, bottomClampLimit, topClampLimit);
+        }
+
+        targetPitch = ClampAngle(targetPitch, bottomClampLimit, topClampLimit);
+        cameraPivot.rotation = Quaternion.Euler(targetPitch, targetYaw, 0f);
+
+
+    }
+
+    private static float ClampAngle(float angle, float min, float max)
+    {
+        if (angle < -360f)
+        {
+            angle += 360f;
+        }
+        if (angle > 360f)
+        {
+            angle -= 360f;
+        }
+
+        return Mathf.Clamp(angle, min, max);
+    }
     public void Fire()
     {    
-        GameObject bullet = Instantiate(originalBullet, transform.position + new Vector3(0, 1, 1), transform.rotation);
+        GameObject bullet = Instantiate(originalBullet, transform.position + Vector3.up + (transform.forward * 2), transform.rotation);
         bullet.SetActive(true);
         Rigidbody rb = bullet.GetComponent<Rigidbody>();
 
