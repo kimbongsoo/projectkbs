@@ -19,14 +19,14 @@ public class CharacterPlayerController : MonoBehaviour
     private float blendRunning = 0f;
 
     [Header("Fire Setting")]
-    public float force = 1500.0f;
-
+    public Transform fireStartPoint;
     public enum FireMode { SingleShot, Burst, Automatic }
     public FireMode fireMode = FireMode.SingleShot;  
     public float fireRate = 0.2f; 
     private float lastFireTime = 0f;
 
     public GameObject originalBullet;
+    public GameObject originalMuzzle;
 
     [Header("Camera Setting")]
     public Transform cameraPivot;
@@ -80,7 +80,11 @@ public class CharacterPlayerController : MonoBehaviour
         bool isAimingInput = Input.GetMouseButton(1); // 우클릭?
         characterAnimator.SetFloat("Aiming", isAimingInput ? 1f : 0f);
 
-   
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            characterAnimator.SetTrigger("Reload Trigger");
+        }
+    
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             fireMode = FireMode.SingleShot;
@@ -192,14 +196,14 @@ public class CharacterPlayerController : MonoBehaviour
     }
     public void Fire()
     {    
-        GameObject bullet = Instantiate(originalBullet, transform.position + Vector3.up + (transform.forward * 2), transform.rotation);
+        GameObject bullet = Instantiate(originalBullet, fireStartPoint.position, fireStartPoint.rotation);
         bullet.SetActive(true);
-        Rigidbody rb = bullet.GetComponent<Rigidbody>();
 
-        if (rb != null) 
-        {
-            rb.AddForce(transform.forward * force);
-        }
+        GameObject muzzle = Instantiate(originalMuzzle, fireStartPoint.position, fireStartPoint.rotation);
+        muzzle.SetActive(true);
+        Destroy(muzzle.gameObject, 1f);
+
+        // if(EffectManager.Instance.GetEffect("Muzzle"))
     }
 
 }
