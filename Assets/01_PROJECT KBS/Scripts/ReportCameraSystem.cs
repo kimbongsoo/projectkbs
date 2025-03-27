@@ -2,11 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Cinemachine;
+using Unity.VisualScripting.Dependencies.Sqlite;
 using UnityEngine;
 
-public class CameraSystem : MonoBehaviour
+public class ReportCameraSystem : MonoBehaviour
 {
-    public static CameraSystem Instance {get; private set;}
+    public static ReportCameraSystem Instance {get; private set;}
     public Vector3 AimingPoint => cameraAimingPoint;
     [field: SerializeField] public Camera MainCamera {get; private set;}
 
@@ -28,11 +29,10 @@ public class CameraSystem : MonoBehaviour
         {
             cameraAimingPoint = hitInfo.point;
             //추가
-            if (Input.GetMouseButtonDown(0) && hitInfo.collider.CompareTag("Capsule"))
+            if (hitInfo.collider.CompareTag("Capsule"))
             {
-                Debug.Log("hitInfo :" + hitInfo);
                 Transform capsule = hitInfo.collider.transform;
-                capsule.localScale *= 1.1f;
+                capsule.localScale *= 3f;
             }
         }
         else
