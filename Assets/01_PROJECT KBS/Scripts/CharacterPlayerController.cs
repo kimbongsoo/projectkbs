@@ -20,13 +20,16 @@ public class CharacterPlayerController : MonoBehaviour
 
     [Header("Fire Setting")]
     public Transform fireStartPoint;
-    public enum FireMode { SingleShot, Burst, Automatic }
+    public enum FireMode { SingleShot, Automatic }
     public FireMode fireMode = FireMode.SingleShot;  
     public float fireRate = 0.2f; 
-    private float lastFireTime = 0f;
+    public float lastFireTime = 0f;
+
+    //추가
+    public int clipSize = 30;
+
 
     public GameObject originalBullet;
-    public GameObject originalMuzzle;
 
     [Header("Camera Setting")]
     public Transform cameraPivot;
@@ -83,6 +86,7 @@ public class CharacterPlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R))
         {
             characterAnimator.SetTrigger("Reload Trigger");
+            clipSize = 30;
         }
     
         if (Input.GetKeyDown(KeyCode.Alpha1))
@@ -92,20 +96,16 @@ public class CharacterPlayerController : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            fireMode = FireMode.Burst; 
-            Debug.Log("Fire Mode: Burst");
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
             fireMode = FireMode.Automatic; 
             Debug.Log("Fire Mode: Automatic");
         }
 
-        if (isAimingInput)
+        if (isAimingInput && clipSize > 0)
         {
             if (fireMode == FireMode.SingleShot && Input.GetMouseButtonDown(0))
             {
                 Fire();
+                Debug.Log("총알 개수" + clipSize);
             }
             else if (fireMode == FireMode.Automatic && Input.GetMouseButton(0) && Time.time >= lastFireTime + fireRate)
             {
@@ -198,12 +198,14 @@ public class CharacterPlayerController : MonoBehaviour
     {    
         GameObject bullet = Instantiate(originalBullet, fireStartPoint.position, fireStartPoint.rotation);
         bullet.SetActive(true);
+        clipSize--;
 
-        GameObject muzzle = Instantiate(originalMuzzle, fireStartPoint.position, fireStartPoint.rotation);
-        muzzle.SetActive(true);
-        Destroy(muzzle.gameObject, 1f);
-
-        // if(EffectManager.Instance.GetEffect("Muzzle"))
+        if(EffectManager.Instance.GetEffect("Muzzle", out GameObject muzzleEffect))
+        {
+            muzzleEffect.transform.position = fireStartPoint.position;
+            muzzleEffect.transform.rotation = fireStartPoint.rotation;
+            Destroy(muzzleEffect.gameObject, 1f);
+        }
     }
 
 }

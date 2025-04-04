@@ -1345,6 +1345,8 @@ MonoBehaviour:
     prefab: {fileID: 832363080}
   - id: Metal
     prefab: {fileID: 757540372}
+  - id: Muzzle
+    prefab: {fileID: 1684560928}
 --- !u!4 &992288733 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3229062428717889361, guid: c0cb2d4582daa42c99e03d9f461dfcaa, type: 3}
