@@ -2,8 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EffectManager : MonoBehaviour
+namespace KBS
 {
+    public class EffectManager : MonoBehaviour
+    {
     public static EffectManager Instance { get; private set;}
 
     [System.Serializable]
@@ -31,6 +33,8 @@ public class EffectManager : MonoBehaviour
         result = Instantiate(targetData.prefab);
         result.SetActive(true);
         return true;
+    }
+
     }
 
 }

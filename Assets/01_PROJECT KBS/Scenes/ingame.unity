@@ -803,6 +803,30 @@ MonoBehaviour:
   - m_Rig: {fileID: 1787154216}
     m_Active: 1
   m_Effectors: []
+--- !u!114 &651083003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 308320914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e64f8f167886747ea8f75826a051a006, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fireStartPoint: {fileID: 1348541862}
+  fireRate: 0.2
+  lastFireTime: 0
+  clipSize: 30
+  moveSpeed: 3
+  noneStrafeRotationSpeed: 1
+  strafeRotationSpeed: 180
+  originalBullet: {fileID: 1531833862}
+  aimingTargetPoint: {fileID: 2053425421}
+  leftHandIk: {fileID: 1803058034}
+  aimingRig: {fileID: 1787154216}
+  characterAnimator: {fileID: 0}
 --- !u!1 &672543388
 GameObject:
   m_ObjectHideFlags: 0
@@ -3018,6 +3042,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3229062428718115391, guid: c0cb2d4582daa42c99e03d9f461dfcaa, type: 3}
       insertIndex: -1
       addedObject: {fileID: 651082998}
+    - targetCorrespondingSourceObject: {fileID: 3229062428718115391, guid: c0cb2d4582daa42c99e03d9f461dfcaa, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 651083003}
   m_SourcePrefab: {fileID: 100100000, guid: c0cb2d4582daa42c99e03d9f461dfcaa, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

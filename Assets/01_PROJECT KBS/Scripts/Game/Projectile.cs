@@ -4,10 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Projectile : MonoBehaviour
+namespace KBS
+{
+    public class Projectile : MonoBehaviour
 {
     public float speed = 100f;
     public float lifeTime = 3f;
+    public static string[] materialNames = { "Wood", "Rock", "Dirt", "Metal" };
     private void Start()
     {
         Rigidbody rb = GetComponent<Rigidbody>();
@@ -23,9 +26,8 @@ public class Projectile : MonoBehaviour
         //총알 충돌처리에 대한 구현
         //TODO 1. Effect를 출력.
         //TODO 2. Damage 처리하기 -> 캐릭터, 배경에 맞았는지
-        string[] materials = { "Wood", "Rock", "Dirt", "Metal" };
 
-        string material = materials.FirstOrDefault(type => collision.collider.material.name.Contains(type));
+        string material = materialNames.FirstOrDefault(type => collision.collider.material.name.Contains(type));
 
         if (EffectManager.Instance.GetEffect(material, out GameObject effect))
         {
@@ -68,5 +70,7 @@ public class Projectile : MonoBehaviour
         Destroy(gameObject);  
 
     }
+
+}
 
 }
