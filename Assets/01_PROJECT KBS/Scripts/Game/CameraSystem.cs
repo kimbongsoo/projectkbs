@@ -16,11 +16,17 @@ namespace KBS
 
         [field: SerializeField] public LayerMask LayerMask {get; private set;}
 
+        private Cinemachine.Cinemachine3rdPersonFollow tpsCamera3rdFollow;
+        private bool isCameraSideRight = true;
+        private float cameraSideBlend = 0f;
+
         private Vector3 cameraAimingPoint;
 
         private void Awake()
         {
             Instance = this;
+            tpsCamera3rdFollow = TpsCamera.GetCinemachineComponent<Cinemachine.Cinemachine3rdPersonFollow>();
+            cameraSideBlend = isCameraSideRight ? 1 : 0;
         }
 
         private void Update()
@@ -41,12 +47,27 @@ namespace KBS
             {
                 cameraAimingPoint = ray.GetPoint(1000f);
             }
+
+            tpsCamera3rdFollow.CameraSide = Mathf.Lerp(tpsCamera3rdFollow.CameraSide, cameraSideBlend, Time.deltaTime * 10f);
         }
 
         private void OnDrawGizmos()
         {
             Gizmos.color = Color.red;
             Gizmos.DrawLine(MainCamera.transform.position, cameraAimingPoint);      
+        }
+
+        public void SetChangeCameraSide(bool isRight)
+        {
+            isCameraSideRight = isRight;
+            cameraSideBlend = isCameraSideRight ? 1 : 0;
+        }
+
+        public void SetChangeCameraSide()
+        {
+            isCameraSideRight = !isCameraSideRight;
+            cameraSideBlend = isCameraSideRight ? 1 : 0;
+
         }
     }
 

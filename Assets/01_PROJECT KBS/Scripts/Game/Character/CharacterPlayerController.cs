@@ -9,6 +9,7 @@ namespace KBS
 {
         public class CharacterPlayerController : MonoBehaviour
     {
+        public TMPro.TextMeshProUGUI anmoText;
         private CharacterBase characterBase;
 
         [Header("Camera Setting")]
@@ -19,11 +20,6 @@ namespace KBS
         private float targetYaw = 0f;
         private float targetPitch = 0f;
 
-
-        private void Start()
-        {
-            SetCursorVisible(false);
-        }
 
         public void SetCursorVisible(bool isVisible)
         {
@@ -36,8 +32,26 @@ namespace KBS
             characterBase = GetComponent<CharacterBase>();
         }
 
+        private void OnEnable()
+        {
+            characterBase.onFireEvent += OnFired;
+        }
+
+        private void OnFired(int current, int max)
+        {
+            anmoText.text = $"{current:00} / {max:00}";
+        }
+        private void Start()
+        {
+            SetCursorVisible(false);
+        }
+
         private void Update()
         {
+            if (Input.GetKeyDown(KeyCode.Tab))
+            {
+                CameraSystem.Instance.SetChangeCameraSide();
+            }
             if (Input.GetMouseButtonDown(0))
             {
                 SetCursorVisible(false);

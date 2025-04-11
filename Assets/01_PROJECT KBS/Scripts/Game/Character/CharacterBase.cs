@@ -52,6 +52,8 @@ namespace KBS
         private float targetHorizontal;
         private float targetVertical;
 
+        public System.Action<int, int> onFireEvent;
+
         private void Awake()
         {
             characterAnimator = GetComponent<Animator>();
@@ -125,8 +127,6 @@ namespace KBS
             }
 
             transform.position += movement;
-
-            
         }
         public void Fire()
         {   
@@ -147,6 +147,8 @@ namespace KBS
                 }
 
                 lastFireTime = Time.time;
+
+                onFireEvent?.Invoke(clipSize, 30);
             }
         }
 
@@ -167,7 +169,7 @@ namespace KBS
 
         public void Combat()
         {
-            if(IsCombat)
+            if(IsCombat || IsReloading)
                 return;
             IsCombat = true;
             characterAnimator.SetTrigger("Combat Trigger");
