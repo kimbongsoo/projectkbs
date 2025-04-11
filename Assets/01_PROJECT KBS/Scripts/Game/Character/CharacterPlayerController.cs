@@ -64,6 +64,12 @@ namespace KBS
                 characterBase.Fire();
             }
 
+            if(Input.GetKeyDown(KeyCode.V))
+            {
+                Debug.Log("v 입력");
+                characterBase.Combat();
+            }
+
             float inputX = Input.GetAxis("Horizontal");
             float inputy = Input.GetAxis("Vertical");
             characterBase.Move(new Vector2(inputX, inputy), Camera.main.transform.eulerAngles.y);

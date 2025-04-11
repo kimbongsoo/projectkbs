@@ -22,6 +22,9 @@ namespace KBS
         public bool IsReloading {get; private set;} = false;
         private bool isAiming = false;
 
+        public bool IsCombat {get; private set;} = false;
+        private bool isCombat = false;
+
         [Header("Fire Setting")]
         public Transform fireStartPoint;
 
@@ -74,6 +77,9 @@ namespace KBS
 
         public void Rotate(Vector3 targetPoint)
         {
+            //추가
+            if(IsCombat)
+                return; 
             if (isAiming)
             {
                 Vector3 target = targetPoint;
@@ -86,6 +92,9 @@ namespace KBS
 
         public void Move(Vector2 input, float yAxisAngle)
         {
+            //추가
+            if(IsCombat)
+                return; 
             characterAnimator.SetFloat("Magnitude", input.magnitude);
             Vector3 movement = Vector3.zero;
             if(input.magnitude > 0f)
@@ -120,7 +129,10 @@ namespace KBS
             
         }
         public void Fire()
-        {    
+        {   
+            //추가
+            if(IsCombat)
+                return; 
             if (isAiming && clipSize > 0 && Time.time >= lastFireTime + fireRate)
             {            
                 GameObject bullet = Instantiate(originalBullet, fireStartPoint.position, fireStartPoint.rotation);
@@ -140,7 +152,7 @@ namespace KBS
 
         public void Reload()
         {
-            if(IsReloading)
+            if(IsReloading || IsCombat)
                 return;
             IsReloading = true;
             characterAnimator.SetTrigger("Reload Trigger");
@@ -151,6 +163,19 @@ namespace KBS
         {
             IsReloading = false;
             clipSize = 30;
+        }
+
+        public void Combat()
+        {
+            if(IsCombat)
+                return;
+            IsCombat = true;
+            characterAnimator.SetTrigger("Combat Trigger");
+        }
+
+        public void CombatComplete()
+        {
+            IsCombat = false;
         }
 
     }
