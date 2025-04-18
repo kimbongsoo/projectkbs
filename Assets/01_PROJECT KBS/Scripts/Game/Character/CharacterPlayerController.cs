@@ -9,7 +9,6 @@ namespace KBS
 {
         public class CharacterPlayerController : MonoBehaviour
     {
-        public TMPro.TextMeshProUGUI anmoText;
         private CharacterBase characterBase;
 
         [Header("Camera Setting")]
@@ -19,6 +18,16 @@ namespace KBS
         private float threshold = 0.01f;
         private float targetYaw = 0f;
         private float targetPitch = 0f;
+
+        [Header("Corsshair Setting")]
+        public float crosshairSpreadSpeed = 0.1f;
+        public float crosshairRecoverySpeed = 0.2f;
+        public float crosshairSpreadMax = 1f;
+        public float crosshairSpreadMin = 0.1f;
+        private float crosshairCurrentSpread = 0f;
+
+
+
 
 
         public void SetCursorVisible(bool isVisible)
@@ -36,22 +45,28 @@ namespace KBS
         {
             characterBase.onFireEvent += OnFired;
             characterBase.onReloadCompleteEvent += OnReloadCompleted;
+            characterBase.OnchangedHP += OnChangedHP;
+            characterBase.OnChangedSP += OnChangedSP;
         }
-        //추가
         private void OnReloadCompleted(int current, int max)
         {
-            anmoText.text = $"{current:00} / {max:00}";
-            anmoText.color = Color.white;
+            MainHUD.Instance.SetAmmoText(current, max);
         }
 
+        private void OnChangedHP(float current, float max)
+        {
+            MainHUD.Instance.SetHP(current, max);
+}
+        private void OnChangedSP(float current, float max)
+        {
+            MainHUD.Instance.SetSP(current, max);
+        }
         private void OnFired(int current, int max)
         {
-            string currentColor = current == 0 ? "red" : "white";
-            anmoText.text = $"<color={currentColor}>{current:00}</color> / {max:00}";
-            // if (current == 0)
-            // {
-            //     anmoText.color = Color.red;
-            // }
+            MainHUD.Instance.SetAmmoText(current, max);
+
+            crosshairCurrentSpread = Mathf.Clamp(crosshairCurrentSpread + crosshairSpreadSpeed, crosshairSpreadMin, crosshairSpreadMax);
+            CrossHairUI.Instance.SetCrosshairSpread(crosshairCurrentSpread / crosshairSpreadMax);
         }
         private void Start()
         {
@@ -106,6 +121,13 @@ namespace KBS
 
             characterBase.AimingPoint = CameraSystem.Instance.AimingPoint;
 
+            //크로스헤어 줄어들기
+            crosshairCurrentSpread = Mathf.Clamp(
+                crosshairCurrentSpread - (crosshairRecoverySpeed * Time.deltaTime)
+                , crosshairSpreadMin
+                , crosshairSpreadMax);
+
+            CrossHairUI.Instance.SetCrosshairSpread(crosshairCurrentSpread / crosshairSpreadMax);
         }
 
 

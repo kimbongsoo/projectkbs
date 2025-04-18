@@ -8,6 +8,10 @@ namespace KBS
 {
     public class CharacterBase : MonoBehaviour
     {
+        public float CurrentHP => currentHP;
+        public float CurrentSP => currentSP;
+        public float MaxHP => maxHP;
+        public float MaxSP => maxSP;
 
         public bool IsRunning {get => isRunning; set => isRunning = value;}
         private bool isRunning = false;
@@ -30,11 +34,15 @@ namespace KBS
 
         public float fireRate = 0.2f; 
         public float lastFireTime = 0f;
-
         public int clipSize = 30;
 
-        [Header("Character Setting")]
+        [Header("Character Stat")]
+        public float maxHP = 1000f;
+        public float maxSP = 100f;
+        private float currentHP = 1000f;
+        private float currentSP = 100f;
 
+        [Header("Character Setting")]
         public float moveSpeed = 3.0f;
         public float noneStrafeRotationSpeed = 1f;
         public float strafeRotationSpeed = 180f;
@@ -53,16 +61,40 @@ namespace KBS
         private float targetVertical;
 
         public System.Action<int, int> onFireEvent;
-        //추가
         public System.Action<int, int> onReloadCompleteEvent;
+        public System.Action<float, float> OnchangedHP; //체력이 바뀔 떄 호출되는 Event
+        public System.Action<float, float> OnChangedSP; //스태미너가 바뀔 때 호출되는 Event
+        
 
         private void Awake()
         {
             characterAnimator = GetComponent<Animator>();
         }
+
+        private void Start()
+        {
+            currentHP = maxHP;
+            currentSP = maxSP;
+
+            OnchangedHP?.Invoke(currentHP, maxHP);
+            OnChangedSP?.Invoke(currentSP, maxSP);
+        }
+
         private void Update()
         {
-            float targetBlendRunning = isRunning ? 1f : 0f;
+            if (IsRunning && currentSP > 0f)
+            {
+                currentSP -= Time.deltaTime;
+                OnChangedSP?.Invoke(currentSP, maxSP);
+            }
+            else
+            {
+                currentSP += Time.deltaTime;
+                OnChangedSP?.Invoke(currentSP, maxSP);
+            }
+            currentSP = Mathf.Clamp(currentSP, 0f, maxSP);
+            
+            float targetBlendRunning = isRunning && currentSP > 0 ? 1f : 0f;
             blendRunning = Mathf.Lerp(blendRunning, targetBlendRunning, Time.deltaTime * 10f);
             characterAnimator.SetFloat("Running", blendRunning);
 
@@ -166,7 +198,7 @@ namespace KBS
             clipSize = 30;
             // onFireEvent?.Invoke(clipSize, 30);
             //추가
-            onReloadCompleteEvent.Invoke(clipSize, 30);
+            onReloadCompleteEvent?.Invoke(clipSize, 30);
         }
 
         public void Combat()
