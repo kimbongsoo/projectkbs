@@ -35,15 +35,30 @@ namespace KBS
         private void OnEnable()
         {
             characterBase.onFireEvent += OnFired;
+            characterBase.onReloadCompleteEvent += OnReloadCompleted;
+        }
+        //추가
+        private void OnReloadCompleted(int current, int max)
+        {
+            anmoText.text = $"{current:00} / {max:00}";
+            anmoText.color = Color.white;
         }
 
         private void OnFired(int current, int max)
         {
-            anmoText.text = $"{current:00} / {max:00}";
+            string currentColor = current == 0 ? "red" : "white";
+            anmoText.text = $"<color={currentColor}>{current:00}</color> / {max:00}";
+            // if (current == 0)
+            // {
+            //     anmoText.color = Color.red;
+            // }
         }
         private void Start()
         {
             SetCursorVisible(false);
+            //추가
+            OnFired(characterBase.clipSize, 30);
+
         }
 
         private void Update()
@@ -90,6 +105,7 @@ namespace KBS
             characterBase.Rotate(CameraSystem.Instance.AimingPoint);
 
             characterBase.AimingPoint = CameraSystem.Instance.AimingPoint;
+
         }
 
 

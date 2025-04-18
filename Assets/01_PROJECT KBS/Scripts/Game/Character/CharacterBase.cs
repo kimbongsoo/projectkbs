@@ -53,6 +53,8 @@ namespace KBS
         private float targetVertical;
 
         public System.Action<int, int> onFireEvent;
+        //추가
+        public System.Action<int, int> onReloadCompleteEvent;
 
         private void Awake()
         {
@@ -79,7 +81,6 @@ namespace KBS
 
         public void Rotate(Vector3 targetPoint)
         {
-            //추가
             if(IsCombat)
                 return; 
             if (isAiming)
@@ -94,7 +95,6 @@ namespace KBS
 
         public void Move(Vector2 input, float yAxisAngle)
         {
-            //추가
             if(IsCombat)
                 return; 
             characterAnimator.SetFloat("Magnitude", input.magnitude);
@@ -130,7 +130,6 @@ namespace KBS
         }
         public void Fire()
         {   
-            //추가
             if(IsCombat)
                 return; 
             if (isAiming && clipSize > 0 && Time.time >= lastFireTime + fireRate)
@@ -165,6 +164,9 @@ namespace KBS
         {
             IsReloading = false;
             clipSize = 30;
+            // onFireEvent?.Invoke(clipSize, 30);
+            //추가
+            onReloadCompleteEvent.Invoke(clipSize, 30);
         }
 
         public void Combat()
