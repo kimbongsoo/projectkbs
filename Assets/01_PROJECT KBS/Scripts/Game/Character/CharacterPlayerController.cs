@@ -71,7 +71,6 @@ namespace KBS
         private void Start()
         {
             SetCursorVisible(false);
-            //추가
             OnFired(characterBase.clipSize, 30);
 
         }

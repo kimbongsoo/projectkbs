@@ -7,6 +7,8 @@ TagManager:
   - Item
   - Bullet
   - Capsule
+  - Red Cube
+  - Blue Cube
   layers:
   - Default
   - TransparentFX

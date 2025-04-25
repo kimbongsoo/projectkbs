@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
@@ -93,7 +94,14 @@ namespace KBS
                 OnChangedSP?.Invoke(currentSP, maxSP);
             }
             currentSP = Mathf.Clamp(currentSP, 0f, maxSP);
-            
+            //추가
+            if (!IsRunning && CurrentHP < maxHP)
+            {
+                currentHP += Time.deltaTime;
+                OnchangedHP?.Invoke(currentHP, maxHP);
+            }
+            currentHP = Mathf.Clamp(currentHP, 0f, maxHP);
+
             float targetBlendRunning = isRunning && currentSP > 0 ? 1f : 0f;
             blendRunning = Mathf.Lerp(blendRunning, targetBlendRunning, Time.deltaTime * 10f);
             characterAnimator.SetFloat("Running", blendRunning);
@@ -108,6 +116,32 @@ namespace KBS
 
             aimingRig.weight = isAiming ? 1f : 0f;
             leftHandIk.weight = IsReloading ? 0f : 1f;
+
+        }
+
+        private void OnTriggerEnter(Collider collider)
+        {
+            if (collider.gameObject.CompareTag("Blue Cube"))
+            {
+                currentHP -= 100f;
+                currentHP = Mathf.Clamp(currentHP, 0f, maxHP);
+                OnchangedHP?.Invoke(currentHP, maxHP);
+                Destroy(collider.gameObject);
+            }
+
+            if (collider.gameObject.CompareTag("Red Cube"))
+            {
+                if(currentHP < maxHP)
+                {    
+                    currentHP += 100f;
+                    currentHP = Mathf.Clamp(currentHP, 0f, maxHP);
+                    OnchangedHP?.Invoke(currentHP, maxHP);
+                    Destroy(collider.gameObject);
+                }
+                else
+                    Destroy(collider.gameObject);
+          
+            }
 
         }
 
@@ -196,8 +230,6 @@ namespace KBS
         {
             IsReloading = false;
             clipSize = 30;
-            // onFireEvent?.Invoke(clipSize, 30);
-            //추가
             onReloadCompleteEvent?.Invoke(clipSize, 30);
         }
 
