@@ -23,11 +23,20 @@ namespace KBS
                 Instance = null;
             }
         }
-        [SerializeField] private TextMeshProUGUI ammoText;
         [SerializeField] private Image hpForeground;
         [SerializeField] private Image spForeground;
         [SerializeField] private TextMeshProUGUI hpText;
         [SerializeField] private TextMeshProUGUI spText;
+
+        [SerializeField] private Image weaponIcon;
+        [SerializeField] private TextMeshProUGUI weaponNameText;
+        [SerializeField] private TextMeshProUGUI ammoText;
+
+        public void SetWeaponData(Sprite weaponImage, string weaponName)
+        {
+            weaponIcon.sprite = weaponImage;
+            weaponNameText.text = weaponName;
+        }
 
         public void SetAmmoText(int current, int max)
         {

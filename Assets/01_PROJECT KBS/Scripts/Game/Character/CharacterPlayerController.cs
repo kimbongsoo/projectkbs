@@ -71,7 +71,7 @@ namespace KBS
         private void Start()
         {
             SetCursorVisible(false);
-            OnFired(characterBase.clipSize, 30);
+            OnFired(characterBase.primaryWeapon.RemainAmmo, characterBase.primaryWeapon.MaxAmmo);
 
         }
 

@@ -30,18 +30,14 @@ namespace KBS
         public bool IsCombat {get; private set;} = false;
         private bool isCombat = false;
 
-        [Header("Fire Setting")]
-        public Transform fireStartPoint;
-
-        public float fireRate = 0.2f; 
-        public float lastFireTime = 0f;
-        public int clipSize = 30;
-
         [Header("Character Stat")]
         public float maxHP = 1000f;
         public float maxSP = 100f;
         private float currentHP = 1000f;
         private float currentSP = 100f;
+
+        [Header("Weapon Setting")]
+        public WeaponBase primaryWeapon;
 
         [Header("Character Setting")]
         public float moveSpeed = 3.0f;
@@ -49,8 +45,6 @@ namespace KBS
         public float strafeRotationSpeed = 180f;
         private float blendCrouch = 0f;
         private float blendRunning = 0f;
-
-        public GameObject originalBullet;
 
         [Header("IK Setting")]
         public Transform aimingTargetPoint;
@@ -94,7 +88,6 @@ namespace KBS
                 OnChangedSP?.Invoke(currentSP, maxSP);
             }
             currentSP = Mathf.Clamp(currentSP, 0f, maxSP);
-            //추가
             if (!IsRunning && CurrentHP < maxHP)
             {
                 currentHP += Time.deltaTime;
@@ -136,10 +129,8 @@ namespace KBS
                     currentHP += 100f;
                     currentHP = Mathf.Clamp(currentHP, 0f, maxHP);
                     OnchangedHP?.Invoke(currentHP, maxHP);
-                    Destroy(collider.gameObject);
                 }
-                else
-                    Destroy(collider.gameObject);
+                Destroy(collider.gameObject);
           
             }
 
@@ -197,23 +188,14 @@ namespace KBS
         public void Fire()
         {   
             if(IsCombat)
-                return; 
-            if (isAiming && clipSize > 0 && Time.time >= lastFireTime + fireRate)
-            {            
-                GameObject bullet = Instantiate(originalBullet, fireStartPoint.position, fireStartPoint.rotation);
-                bullet.SetActive(true);
-                clipSize--;
+                return;
 
-                if(EffectManager.Instance.GetEffect("Muzzle", out GameObject muzzleEffect))
+            if (isAiming)
+            {
+                if (primaryWeapon.Shoot(out int remain, out int max))
                 {
-                    muzzleEffect.transform.position = fireStartPoint.position;
-                    muzzleEffect.transform.rotation = fireStartPoint.rotation;
-                    Destroy(muzzleEffect.gameObject, 1f);
+                    onFireEvent?.Invoke(remain, max);
                 }
-
-                lastFireTime = Time.time;
-
-                onFireEvent?.Invoke(clipSize, 30);
             }
         }
 
@@ -229,8 +211,8 @@ namespace KBS
         public void ReloadComplete()
         {
             IsReloading = false;
-            clipSize = 30;
-            onReloadCompleteEvent?.Invoke(clipSize, 30);
+            int fullAmmo = primaryWeapon.SetFullAmmo();
+            onReloadCompleteEvent?.Invoke(fullAmmo, fullAmmo);
         }
 
         public void Combat()
