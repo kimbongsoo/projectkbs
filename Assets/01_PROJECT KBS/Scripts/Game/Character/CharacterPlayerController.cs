@@ -105,16 +105,7 @@ namespace KBS
             if (Input.GetMouseButton(0))
             {
                 characterBase.Fire();
-                // if (characterBase.primaryWeapon.IsEmpty())
-                // {
-                //     characterBase.Reload();
-                // }
             }
-
-            if (Input.GetMouseButtonDown(0) && characterBase.primaryWeapon.IsEmpty())
-            {
-                characterBase.Reload();
-            } 
 
             if (Input.GetKeyDown(KeyCode.V))
                 {

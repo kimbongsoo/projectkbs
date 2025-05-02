@@ -187,7 +187,7 @@ namespace KBS
         }
         public void Fire()
         {   
-            if(IsCombat)
+            if(IsCombat || IsReloading)
                 return;
 
             if (isAiming)
@@ -195,6 +195,13 @@ namespace KBS
                 if (primaryWeapon.Shoot(out int remain, out int max))
                 {
                     onFireEvent?.Invoke(remain, max);
+                }
+                else
+                {
+                    if (primaryWeapon.IsEmpty())
+                    {
+                        Reload();
+                    }
                 }
             }
         }
