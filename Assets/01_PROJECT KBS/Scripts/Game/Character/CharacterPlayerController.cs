@@ -102,16 +102,25 @@ namespace KBS
                 characterBase.Reload();
             }
 
-            if(Input.GetMouseButton(0))
+            if (Input.GetMouseButton(0))
             {
                 characterBase.Fire();
+                // if (characterBase.primaryWeapon.IsEmpty())
+                // {
+                //     characterBase.Reload();
+                // }
             }
 
-            if(Input.GetKeyDown(KeyCode.V))
+            if (Input.GetMouseButtonDown(0) && characterBase.primaryWeapon.IsEmpty())
             {
-                Debug.Log("v 입력");
-                characterBase.Combat();
-            }
+                characterBase.Reload();
+            } 
+
+            if (Input.GetKeyDown(KeyCode.V))
+                {
+                    Debug.Log("v 입력");
+                    characterBase.Combat();
+                }
 
             float inputX = Input.GetAxis("Horizontal");
             float inputy = Input.GetAxis("Vertical");

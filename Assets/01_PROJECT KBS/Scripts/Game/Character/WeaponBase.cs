@@ -10,10 +10,10 @@ namespace KBS
         public int MaxAmmo => maxAmmo;
 
         [Header("Fire Setting")]
-        [SerializeField]private Transform fireStartPoint;
-        [SerializeField]private GameObject originalBullet;
-        [SerializeField]private float fireRate = 0.2f;
-        [SerializeField]private float lastFireTime = 0f;
+        [SerializeField] private Transform fireStartPoint;
+        [SerializeField] private GameObject originalBullet;
+        [SerializeField] private float fireRate = 0.2f;
+        [SerializeField] private float lastFireTime = 0f;
         [SerializeField] private int maxAmmo = 30;
         [SerializeField] private int clipSize = 30;
         public bool Shoot(out int remain, out int max)
@@ -43,6 +43,11 @@ namespace KBS
         {
             clipSize = maxAmmo;
             return maxAmmo;
+        }
+
+        public bool IsEmpty()
+        {
+            return clipSize == 0;
         }
     }
 }
