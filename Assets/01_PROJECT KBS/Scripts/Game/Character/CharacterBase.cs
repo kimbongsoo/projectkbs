@@ -116,10 +116,16 @@ namespace KBS
         {
             if (collider.gameObject.CompareTag("Blue Cube"))
             {
-                currentHP -= 100f;
+                // currentHP -= 100f;
+                currentHP -= 1000f;
                 currentHP = Mathf.Clamp(currentHP, 0f, maxHP);
                 OnchangedHP?.Invoke(currentHP, maxHP);
                 Destroy(collider.gameObject);
+
+                if (currentHP <= 0f)
+                {
+                    Main.Instance.ChangeScene(SceneType.Title);
+                }
             }
 
             if (collider.gameObject.CompareTag("Red Cube"))
