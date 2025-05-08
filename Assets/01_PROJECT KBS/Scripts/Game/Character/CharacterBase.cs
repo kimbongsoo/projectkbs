@@ -124,7 +124,7 @@ namespace KBS
 
                 if (currentHP <= 0f)
                 {
-                    Main.Instance.ChangeScene(SceneType.Title);
+                    Main.Singleton.ChangeScene(SceneType.Title);
                 }
             }
 

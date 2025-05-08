@@ -1,6 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace KBS
@@ -12,18 +10,14 @@ namespace KBS
         Title,
         Ingame
     }
-    public class Main : MonoBehaviour
+    public class Main : SingletonBase<Main>
     {
-        public static Main Instance { get; private set; } = null;
         public SceneBase currentScene;
         private SceneType currentSceneType;
 
-        private void Awake()
-        {
-            Instance = this;
-            DontDestroyOnLoad(this.gameObject);
 
-            Initialize();
+        private void Start()
+        {
             StartUp();
         }
 
@@ -35,7 +29,7 @@ namespace KBS
         public void StartUp()
         {
             //Start로 시작하는 씬을 타이틀 씬으로 설정
-            ChangeScene(SceneType.Title);
+            // ChangeScene(SceneType.Title);
         }
 
         public void ChangeScene(SceneType sceneType)

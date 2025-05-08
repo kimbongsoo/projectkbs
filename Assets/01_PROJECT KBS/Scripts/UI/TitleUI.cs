@@ -8,7 +8,7 @@ namespace KBS
     {
         public void OnClickGameStart()
         {
-            Main.Instance.ChangeScene(SceneType.Ingame);
+            Main.Singleton.ChangeScene(SceneType.Ingame);
         }
         public void OnClickSetting()
         {

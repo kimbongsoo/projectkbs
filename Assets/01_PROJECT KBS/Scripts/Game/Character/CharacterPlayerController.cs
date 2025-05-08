@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
+using UnityEngine.UI;
 
 namespace KBS
 {
-        public class CharacterPlayerController : MonoBehaviour
+    public class CharacterPlayerController : MonoBehaviour
     {
         private CharacterBase characterBase;
 
@@ -27,18 +28,26 @@ namespace KBS
         private float crosshairCurrentSpread = 0f;
 
 
-
-
-
-        public void SetCursorVisible(bool isVisible)
-        {
-            Cursor.visible = isVisible;
-            Cursor.lockState = isVisible ? CursorLockMode.None : CursorLockMode.Locked;
-            
-        }
         private void Awake()
         {
             characterBase = GetComponent<CharacterBase>();
+        }
+
+        private void Start()
+        {
+            InputManager.Singleton.OnTab += CameraTab;
+            InputManager.Singleton.OnCrouch += ToggleCrouch;
+            InputManager.Singleton.OnReload += ExecuteReload;
+            InputManager.Singleton.OnCombat += ExecuteCombat;
+            OnFired(characterBase.primaryWeapon.RemainAmmo, characterBase.primaryWeapon.MaxAmmo);
+        }
+
+        private void OnDestroy()
+        {
+            InputManager.Singleton.OnTab -= CameraTab;
+            InputManager.Singleton.OnCrouch -= ToggleCrouch;
+            InputManager.Singleton.OnReload -= ExecuteReload;
+            InputManager.Singleton.OnCombat -= ExecuteCombat;           
         }
 
         private void OnEnable()
@@ -48,6 +57,7 @@ namespace KBS
             characterBase.OnchangedHP += OnChangedHP;
             characterBase.OnChangedSP += OnChangedSP;
         }
+
         private void OnReloadCompleted(int current, int max)
         {
             MainHUD.Instance.SetAmmoText(current, max);
@@ -56,7 +66,7 @@ namespace KBS
         private void OnChangedHP(float current, float max)
         {
             MainHUD.Instance.SetHP(current, max);
-}
+        }
         private void OnChangedSP(float current, float max)
         {
             MainHUD.Instance.SetSP(current, max);
@@ -68,54 +78,21 @@ namespace KBS
             crosshairCurrentSpread = Mathf.Clamp(crosshairCurrentSpread + crosshairSpreadSpeed, crosshairSpreadMin, crosshairSpreadMax);
             CrossHairUI.Instance.SetCrosshairSpread(crosshairCurrentSpread / crosshairSpreadMax);
         }
-        private void Start()
-        {
-            SetCursorVisible(false);
-            OnFired(characterBase.primaryWeapon.RemainAmmo, characterBase.primaryWeapon.MaxAmmo);
-
-        }
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Tab))
-            {
-                CameraSystem.Instance.SetChangeCameraSide();
-            }
-            if (Input.GetMouseButtonDown(0))
-            {
-                SetCursorVisible(false);
-            }
-
-            bool isInputRunning = Input.GetKey(KeyCode.LeftShift);
+            bool isInputRunning = InputManager.Singleton.InputSprint;
             characterBase.IsRunning = isInputRunning;
 
-            if (Input.GetKeyDown(KeyCode.C))
-            {
-                characterBase.IsCrouch = !characterBase.IsCrouch;
-            }
-            
-            bool isAimingInput = Input.GetMouseButton(1); // 우클릭?
+            bool isAimingInput = InputManager.Singleton.InputAim;
             characterBase.IsAiming = isAimingInput;
 
-            if (Input.GetKeyDown(KeyCode.R))
-            {
-                characterBase.Reload();
-            }
-
-            if (Input.GetMouseButton(0))
+            if (InputManager.Singleton.InputFire)
             {
                 characterBase.Fire();
             }
 
-            if (Input.GetKeyDown(KeyCode.V))
-                {
-                    Debug.Log("v 입력");
-                    characterBase.Combat();
-                }
-
-            float inputX = Input.GetAxis("Horizontal");
-            float inputy = Input.GetAxis("Vertical");
-            characterBase.Move(new Vector2(inputX, inputy), Camera.main.transform.eulerAngles.y);
+            characterBase.Move(InputManager.Singleton.InputMove, Camera.main.transform.eulerAngles.y);
             characterBase.Rotate(CameraSystem.Instance.AimingPoint);
 
             characterBase.AimingPoint = CameraSystem.Instance.AimingPoint;
@@ -137,9 +114,7 @@ namespace KBS
 
         public void CameraRotation()
         {
-            float mouseX = Input.GetAxis("Mouse X");
-            float mouseY = Input.GetAxis("Mouse Y");
-            Vector2 look = new Vector2(mouseX, mouseY);
+            Vector2 look = InputManager.Singleton.InputLook;
 
             if (look.sqrMagnitude > threshold)
             {
@@ -169,6 +144,24 @@ namespace KBS
 
             return Mathf.Clamp(angle, min, max);
         }
+        
+        void CameraTab()
+        {
+            CameraSystem.Instance.SetChangeCameraSide();
+        }
+        void ToggleCrouch()
+        {
+            characterBase.IsCrouch = !characterBase.IsCrouch;
+        }
+        void ExecuteReload()
+        {
+            characterBase.Reload();
+        }
+        void ExecuteCombat()
+        {
+            characterBase.Combat();
+        }
+
 
     }
 
