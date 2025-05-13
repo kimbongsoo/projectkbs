@@ -9,6 +9,7 @@ TagManager:
   - Capsule
   - Red Cube
   - Blue Cube
+  - Target
   layers:
   - Default
   - TransparentFX

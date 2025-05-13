@@ -9,7 +9,7 @@ namespace KBS
     public class MainHUD : MonoBehaviour
     {
 
-        public static MainHUD Instance { get; private set;} = null;
+        public static MainHUD Instance { get; private set; } = null;
 
         private void Awake()
         {
@@ -31,6 +31,8 @@ namespace KBS
         [SerializeField] private Image weaponIcon;
         [SerializeField] private TextMeshProUGUI weaponNameText;
         [SerializeField] private TextMeshProUGUI ammoText;
+
+        [SerializeField] private TextMeshProUGUI scoreText;
 
         public void SetWeaponData(Sprite weaponImage, string weaponName)
         {
@@ -54,6 +56,11 @@ namespace KBS
         {
             spForeground.fillAmount = current / max;
             spText.text = $"{current:00}/{max:00}";
+        }
+
+        public void SetScore(int score)
+        {
+            scoreText.text = $"Score:{score}";
         }
 
 
