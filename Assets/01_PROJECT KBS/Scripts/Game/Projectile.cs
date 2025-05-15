@@ -37,7 +37,7 @@ namespace KBS
             }
             Destroy(gameObject);
 
-            if (collision.gameObject.name == "Target")
+            if (collision.gameObject.CompareTag("Target"))
             {
                 ScoreManager.Singleton.AddScore(100);
             }

@@ -15,6 +15,6 @@ EditorBuildSettings:
     path: Assets/01_PROJECT KBS/Scenes/Title.unity
     guid: e1d6b62b315a143fa9cdfdebd2da7c66
   - enabled: 1
-    path: Assets/01_PROJECT KBS/Scenes/Ingame2.unity
+    path: Assets/01_PROJECT KBS/Scenes/Ingame.unity
     guid: e16f5449e2f2c4edd8b20f635c93dc59
   m_configObjects: {}
