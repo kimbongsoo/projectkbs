@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace KBS
 {
-    public class TitleUI : MonoBehaviour
+    public class TitleUI : UIBase
     {
         public void OnClickGameStart()
         {

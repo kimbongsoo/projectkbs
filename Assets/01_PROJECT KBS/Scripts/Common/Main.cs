@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace KBS
 {
@@ -15,6 +16,8 @@ namespace KBS
         public SceneBase currentScene;
         private SceneType currentSceneType;
 
+        private bool isInitialized = false;
+
 
         private void Start()
         {
@@ -23,13 +26,27 @@ namespace KBS
 
         public void Initialize()
         {
+            if (isInitialized)
+                return;
+            // Manager & System Initialize
+            UIManager.Singleton.Initialize();
 
+            isInitialized = true;
         }
 
         public void StartUp()
         {
-            //Start로 시작하는 씬을 타이틀 씬으로 설정
-            // ChangeScene(SceneType.Title);
+            Initialize();
+
+#if UNITY_EDITOR
+            Scene activeScene = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene();
+            if (activeScene.name.Equals("Main"))
+            {
+                ChangeScene(SceneType.Title);
+            }
+#else
+            ChangeScene(SceneType.Title);
+#endif
         }
 
         public void ChangeScene(SceneType sceneType)
@@ -56,16 +73,31 @@ namespace KBS
 
         private IEnumerator InternalChangeScene<T>(SceneType sceneType) where T : SceneBase
         {
+            var loadingUI = UIManager.Show<LoadingUI>(UIList.LoadingUI);
+            loadingUI.LoadingPercentage = 0f;
+
             if (currentScene != null)
             {
                 yield return StartCoroutine(currentScene.OnEnd());
                 Destroy(currentScene.gameObject);
             }
+            loadingUI.LoadingPercentage = 0.45f;
+            yield return new WaitForEndOfFrame();
+
 
             GameObject newSceneInstance = new GameObject(typeof(T).Name);
             newSceneInstance.transform.SetParent(this.transform);
             currentScene = newSceneInstance.AddComponent<T>();
-            yield return StartCoroutine(currentScene.OnStart());                 
+            yield return StartCoroutine(currentScene.OnStart());
+            loadingUI.LoadingPercentage = 0.8f;
+            yield return new WaitForEndOfFrame();
+
+            yield return new WaitForSeconds(0.3f);
+            loadingUI.LoadingPercentage = 1f;
+            yield return new WaitForSeconds(0.3f);
+            UIManager.Hide<LoadingUI>(UIList.LoadingUI);  
+
+            currentSceneType = sceneType;               
         }
 
     

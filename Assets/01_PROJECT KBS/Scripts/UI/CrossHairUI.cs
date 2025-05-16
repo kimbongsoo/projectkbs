@@ -4,22 +4,9 @@ using UnityEngine;
 
 namespace KBS
 {
-    public class CrossHairUI : MonoBehaviour
+    public class CrossHairUI : UIBase
     {
-        public static CrossHairUI Instance { get; private set; } = null;
-
-        private void Awake()
-        {
-            Instance = this;
-        }
-
-        private void OnDestroy()
-        {
-            if (Instance == this)
-            {
-                Instance = this;
-            }
-        }
+        public static CrossHairUI Instance => UIManager.Singleton.GetUI<CrossHairUI>(UIList.CrossHairUI);
         [SerializeField] private RectTransform crosshairTop;
         [SerializeField] private RectTransform crosshairBottom;
         [SerializeField] private RectTransform crosshairLeft;

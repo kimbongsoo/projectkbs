@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace KBS
 {
-    public class LoadingUI : MonoBehaviour
+    public class LoadingUI : UIBase
     {
         public float LoadingPercentage
         {
@@ -12,7 +12,7 @@ namespace KBS
             {
                 currentLoadingPercentage = Mathf.Clamp01(value);
                 loadingBar.fillAmount = currentLoadingPercentage;
-                percentageText.text = $"{currentLoadingPercentage:0} %";
+                percentageText.text = $"{currentLoadingPercentage * 100f:0} %";
                 
             }
         }

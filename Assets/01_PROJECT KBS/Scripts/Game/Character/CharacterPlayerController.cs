@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
+using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 
 namespace KBS
 {
     public class CharacterPlayerController : MonoBehaviour
     {
+        public static CharacterPlayerController Instance { get; private set; } = null;
         private CharacterBase characterBase;
 
         [Header("Camera Setting")]
@@ -27,10 +29,16 @@ namespace KBS
         public float crosshairSpreadMin = 0.1f;
         private float crosshairCurrentSpread = 0f;
 
+        [Header("Camera Recoil Setting")]
+        public float recoilRecoverySpeed = 2f;
+        private Vector3 targetRotation;
+        private Vector3 currentRotation;
+        
 
         private void Awake()
         {
             characterBase = GetComponent<CharacterBase>();
+            Instance = this;
         }
 
         private void Start()
@@ -110,6 +118,7 @@ namespace KBS
         private void LateUpdate()
         {
             CameraRotation();
+            CameraRecovery();
         }
 
         public void CameraRotation()
@@ -121,14 +130,28 @@ namespace KBS
                 float yaw = look.x;
                 float pitch = -look.y;
 
-                targetYaw = ClampAngle(targetYaw + yaw, float.MinValue, float.MaxValue);
-                targetPitch = ClampAngle(targetPitch + pitch, bottomClampLimit, topClampLimit);
+                targetYaw += yaw;
+                targetPitch -= pitch;
             }
 
+            targetYaw = ClampAngle(targetYaw, float.MinValue, float.MaxValue);
             targetPitch = ClampAngle(targetPitch, bottomClampLimit, topClampLimit);
-            cameraPivot.rotation = Quaternion.Euler(targetPitch, targetYaw, 0f);
 
+            cameraPivot.rotation = Quaternion.Euler(targetPitch + currentRotation.x, targetYaw + currentRotation.y, 0f);
 
+        }
+
+        public void CameraRecoil(float recoilAmount, float vertical = 2f, float horizontal = 1f)
+        {
+            float xRecoil = -vertical * recoilAmount;
+            float yRecoil = UnityEngine.Random.Range(-horizontal, horizontal) * recoilAmount;
+            targetRotation += new Vector3(xRecoil, yRecoil, 0f);
+        }
+
+        public void CameraRecovery()
+        {
+            targetRotation = Vector3.Lerp(targetRotation, Vector3.zero, Time.deltaTime * recoilRecoverySpeed);
+            currentRotation = Vector3.Lerp(currentRotation, targetRotation, Time.deltaTime * recoilRecoverySpeed);
         }
 
         private static float ClampAngle(float angle, float min, float max)

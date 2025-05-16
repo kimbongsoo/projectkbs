@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 
 namespace KBS
 {
@@ -32,10 +33,16 @@ namespace KBS
                     Destroy(muzzleEffect.gameObject, 1f);
                 }
 
+                float recoil = 2f;
+                float vertical = 2f;
+                float horizontal = 1f;
+                CharacterPlayerController.Instance.CameraRecoil(recoil, vertical, horizontal);
+
                 lastFireTime = Time.time;
             }
             remain = clipSize;
             max = maxAmmo;
+
             return isShootable;
         }
 

@@ -13,6 +13,9 @@ namespace KBS
             yield return new WaitUntil(()=> async.isDone);
             // TODO : Ingame Scene Initialize
             // TODO : Show Ingame Scene UI
+            UIManager.Show<MainHUD>(UIList.MainHUD);
+            UIManager.Show<CrossHairUI>(UIList.CrossHairUI);
+
             yield return null;
         }
 
@@ -22,6 +25,9 @@ namespace KBS
 
             // TODO : Ingame Scene Destory
             // TODO : Hide Ingame Scene UI
+            UIManager.Hide<MainHUD>(UIList.MainHUD);
+            UIManager.Hide<CrossHairUI>(UIList.CrossHairUI);
+
         }
 
     }

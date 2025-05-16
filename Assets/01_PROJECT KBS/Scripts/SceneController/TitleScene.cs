@@ -13,6 +13,9 @@ namespace KBS
             yield return new WaitUntil(()=> async.isDone);
             // TODO : Title Scene Initialize
             // TODO : Show Title Scene UI
+
+            UIManager.Show<TitleUI>(UIList.TitleUI);
+
             yield return null;
         }
 
@@ -22,6 +25,7 @@ namespace KBS
 
             // TODO : Title Scene Destory
             // TODO : Hide Title Scene UI
+            UIManager.Hide<TitleUI>(UIList.TitleUI);
         }
     }
 }

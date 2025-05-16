@@ -6,23 +6,12 @@ using TMPro;
 
 namespace KBS
 {
-    public class MainHUD : MonoBehaviour
+    public class MainHUD : UIBase
     {
 
-        public static MainHUD Instance { get; private set; } = null;
+        public static MainHUD Instance => UIManager.Singleton.GetUI<MainHUD>(UIList.MainHUD);
 
-        private void Awake()
-        {
-            Instance = this;
-        }
 
-        private void OnDestroy()
-        {
-            if (Instance == this)
-            {
-                Instance = null;
-            }
-        }
         [SerializeField] private Image hpForeground;
         [SerializeField] private Image spForeground;
         [SerializeField] private TextMeshProUGUI hpText;
