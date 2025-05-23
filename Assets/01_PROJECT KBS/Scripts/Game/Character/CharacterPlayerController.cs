@@ -33,7 +33,7 @@ namespace KBS
         public float recoilRecoverySpeed = 2f;
         private Vector3 targetRotation;
         private Vector3 currentRotation;
-        
+
 
         private void Awake()
         {
@@ -47,6 +47,8 @@ namespace KBS
             InputManager.Singleton.OnCrouch += ToggleCrouch;
             InputManager.Singleton.OnReload += ExecuteReload;
             InputManager.Singleton.OnCombat += ExecuteCombat;
+            InputManager.Singleton.OnHolster += ExecuteHolster;
+            InputManager.Singleton.OnPrimaryWeapon += ExecuteEquipPrimaryWeapon;
             OnFired(characterBase.primaryWeapon.RemainAmmo, characterBase.primaryWeapon.MaxAmmo);
         }
 
@@ -55,7 +57,7 @@ namespace KBS
             InputManager.Singleton.OnTab -= CameraTab;
             InputManager.Singleton.OnCrouch -= ToggleCrouch;
             InputManager.Singleton.OnReload -= ExecuteReload;
-            InputManager.Singleton.OnCombat -= ExecuteCombat;           
+            InputManager.Singleton.OnCombat -= ExecuteCombat;
         }
 
         private void OnEnable()
@@ -131,7 +133,7 @@ namespace KBS
                 float pitch = -look.y;
 
                 targetYaw += yaw;
-                targetPitch -= pitch;
+                targetPitch += pitch;
             }
 
             targetYaw = ClampAngle(targetYaw, float.MinValue, float.MaxValue);
@@ -167,22 +169,35 @@ namespace KBS
 
             return Mathf.Clamp(angle, min, max);
         }
-        
+
         void CameraTab()
         {
             CameraSystem.Instance.SetChangeCameraSide();
         }
+
         void ToggleCrouch()
         {
             characterBase.IsCrouch = !characterBase.IsCrouch;
         }
+
         void ExecuteReload()
         {
             characterBase.Reload();
         }
+
         void ExecuteCombat()
         {
             characterBase.Combat();
+        }
+
+        void ExecuteHolster()
+        {
+            characterBase.HolsterWeapon();
+        }
+
+        void ExecuteEquipPrimaryWeapon()
+        {
+            characterBase.EquipWeapon();
         }
 
 

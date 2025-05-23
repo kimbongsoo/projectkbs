@@ -20,6 +20,8 @@ namespace KBS
         public event System.Action OnCrouch;
         public event System.Action OnReload;
         public event System.Action OnCombat;
+        public event System.Action OnHolster;
+        public event System.Action OnPrimaryWeapon;
 
 
         private void Start()
@@ -39,7 +41,7 @@ namespace KBS
         {
             bool isForceCursorVisible = Input.GetKey(KeyCode.LeftAlt);
             SetCursorVisible(isForceCursorVisible);
-            
+
             move = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
             look = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
 
@@ -62,6 +64,14 @@ namespace KBS
             if (Input.GetKeyDown(KeyCode.V))
             {
                 OnCombat?.Invoke();
+            }
+            if (Input.GetKeyDown(KeyCode.T))
+            {
+                OnHolster?.Invoke();
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                OnPrimaryWeapon?.Invoke();
             }
         }
         

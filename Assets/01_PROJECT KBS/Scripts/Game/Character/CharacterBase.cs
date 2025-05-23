@@ -14,21 +14,23 @@ namespace KBS
         public float MaxHP => maxHP;
         public float MaxSP => maxSP;
 
-        public bool IsRunning {get => isRunning; set => isRunning = value;}
+        public bool IsRunning { get => isRunning; set => isRunning = value; }
         private bool isRunning = false;
 
-        public bool IsCrouch {get => isCrouch; set => isCrouch = value;}
+        public bool IsCrouch { get => isCrouch; set => isCrouch = value; }
         private bool isCrouch = false;
 
-        public bool IsAiming {get => isAiming; set => isAiming = value;}
+        public bool IsAiming { get => isAiming; set => isAiming = value; }
 
-        public Vector3 AimingPoint {get => aimingTargetPoint.position; set => aimingTargetPoint.position = value;}
+        public Vector3 AimingPoint { get => aimingTargetPoint.position; set => aimingTargetPoint.position = value; }
 
-        public bool IsReloading {get; private set;} = false;
+        public bool IsReloading { get; private set; } = false;
         private bool isAiming = false;
 
-        public bool IsCombat {get; private set;} = false;
+        public bool IsCombat { get; private set; } = false;
         private bool isCombat = false;
+
+        public bool IsArmed { get; private set; } = false;
 
         [Header("Character Stat")]
         public float maxHP = 1000f;
@@ -50,20 +52,39 @@ namespace KBS
         public Transform aimingTargetPoint;
         public TwoBoneIKConstraint leftHandIk;
         public Rig aimingRig;
-        public Animator characterAnimator;
         private float targetRotation;
         private float targetHorizontal;
         private float targetVertical;
+
+        [Header("Weapon Holster")]
+        public Transform weaponHolsterPlace;
+        public Transform weaponEquipPlace;
+
+        [Header("Components")]
+        public Animator characterAnimator;
+        public UnityEngine.CharacterController unityCharacterController;
+
+        [Header("GroundCheck")]
+        public float groundCheckRadius = 0.05f;
+        public float groundOffset = 0.1f;
+        public LayerMask groundLayer;
+        public bool isGrounded;
+
+        [Header("Gravity")]
+        public float verticalVelocity;
+        public float terminalVelocity = 50f;
+        public float gravity = -15f;
 
         public System.Action<int, int> onFireEvent;
         public System.Action<int, int> onReloadCompleteEvent;
         public System.Action<float, float> OnchangedHP; //체력이 바뀔 떄 호출되는 Event
         public System.Action<float, float> OnChangedSP; //스태미너가 바뀔 때 호출되는 Event
-        
+
 
         private void Awake()
         {
             characterAnimator = GetComponent<Animator>();
+            unityCharacterController = GetComponent<UnityEngine.CharacterController>();
         }
 
         private void Start()
@@ -77,6 +98,9 @@ namespace KBS
 
         private void Update()
         {
+            JumpAndGravity();
+            CheckGround();
+
             if (IsRunning && currentSP > 0f)
             {
                 currentSP -= Time.deltaTime;
@@ -107,8 +131,8 @@ namespace KBS
             characterAnimator.SetFloat("Horizontal", targetHorizontal);
             characterAnimator.SetFloat("Vertical", targetVertical);
 
-            aimingRig.weight = isAiming ? 1f : 0f;
-            leftHandIk.weight = IsReloading ? 0f : 1f;
+            aimingRig.weight = IsArmed && isAiming ? 1f : 0f;
+            leftHandIk.weight = IsArmed && IsReloading ? 0f : 1f;
 
         }
 
@@ -117,7 +141,7 @@ namespace KBS
             if (collider.gameObject.CompareTag("Blue Cube"))
             {
                 // currentHP -= 100f;
-                currentHP -= 1000f;
+                // currentHP -= 1000f;
                 currentHP = Mathf.Clamp(currentHP, 0f, maxHP);
                 OnchangedHP?.Invoke(currentHP, maxHP);
                 Destroy(collider.gameObject);
@@ -130,22 +154,22 @@ namespace KBS
 
             if (collider.gameObject.CompareTag("Red Cube"))
             {
-                if(currentHP < maxHP)
-                {    
+                if (currentHP < maxHP)
+                {
                     currentHP += 100f;
                     currentHP = Mathf.Clamp(currentHP, 0f, maxHP);
                     OnchangedHP?.Invoke(currentHP, maxHP);
                 }
                 Destroy(collider.gameObject);
-          
+
             }
 
         }
 
         public void Rotate(Vector3 targetPoint)
         {
-            if(IsCombat)
-                return; 
+            if (IsCombat)
+                return;
             if (isAiming)
             {
                 Vector3 target = targetPoint;
@@ -158,20 +182,20 @@ namespace KBS
 
         public void Move(Vector2 input, float yAxisAngle)
         {
-            if(IsCombat)
-                return; 
+            if (IsCombat)
+                return;
             characterAnimator.SetFloat("Magnitude", input.magnitude);
             Vector3 movement = Vector3.zero;
-            if(input.magnitude > 0f)
+            if (input.magnitude > 0f)
             {
-                if(!isAiming)
+                if (!isAiming)
                 {
                     Vector3 inputDirection = new Vector3(input.x, 0f, input.y);
                     targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg + yAxisAngle;
                     transform.rotation = Quaternion.Euler(0f, targetRotation, 0f);
                 }
 
-                if(isAiming)
+                if (isAiming)
                 {
                     targetHorizontal = input.x;
                     targetVertical = input.y;
@@ -189,11 +213,12 @@ namespace KBS
                 targetVertical = 0f;
             }
 
-            transform.position += movement;
+            // transform.position += movement;
+            unityCharacterController.Move(movement + new Vector3(0, verticalVelocity, 0));
         }
         public void Fire()
-        {   
-            if(IsCombat || IsReloading)
+        {
+            if (IsCombat || IsReloading)
                 return;
 
             if (isAiming)
@@ -214,7 +239,7 @@ namespace KBS
 
         public void Reload()
         {
-            if(IsReloading || IsCombat)
+            if (IsReloading || IsCombat)
                 return;
             IsReloading = true;
             characterAnimator.SetTrigger("Reload Trigger");
@@ -230,7 +255,7 @@ namespace KBS
 
         public void Combat()
         {
-            if(IsCombat || IsReloading)
+            if (IsCombat || IsReloading)
                 return;
             IsCombat = true;
             characterAnimator.SetTrigger("Combat Trigger");
@@ -241,5 +266,57 @@ namespace KBS
             IsCombat = false;
         }
 
+        public void EquipWeapon()
+        {
+            characterAnimator.SetTrigger("Equip Trigger");
+            IsArmed = true;
+        }
+
+        public void HolsterWeapon()
+        {
+            characterAnimator.SetTrigger("Holster Trigger");
+            IsArmed = false;
+        }
+
+        public void OnWeaponToEquipPlace()
+        {
+            primaryWeapon.transform.SetParent(weaponEquipPlace);
+            primaryWeapon.transform.localPosition = Vector3.zero;
+            primaryWeapon.transform.localRotation = Quaternion.Euler(0, -90f, 0);
+        }
+
+        public void OnWeaponToHolsterPlace()
+        {
+            primaryWeapon.transform.SetParent(weaponHolsterPlace);
+            primaryWeapon.transform.localPosition = Vector3.zero;
+            primaryWeapon.transform.localRotation = Quaternion.identity;
+        }
+
+
+        public void CheckGround()
+        {
+            Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - groundOffset, transform.position.z);
+            isGrounded = Physics.CheckSphere(transform.position, groundCheckRadius, groundLayer, QueryTriggerInteraction.Ignore);
+            characterAnimator.SetBool("IsGrounded", isGrounded);
+        }
+
+        public void JumpAndGravity()
+        {
+            if (isGrounded)
+            {
+                verticalVelocity = -2f;
+            }
+            else //점프관련 코드
+            {
+                // verticalVelocity = Mathf.Sqrt(2f * gravity);
+                verticalVelocity = (-9.81f * Time.deltaTime);
+            }
+
+            if (verticalVelocity < terminalVelocity)
+            {
+                verticalVelocity += (gravity * Time.deltaTime);
+            }
+
+        }
     }
 }
