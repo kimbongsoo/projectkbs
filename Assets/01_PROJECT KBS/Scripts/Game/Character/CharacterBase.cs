@@ -31,6 +31,7 @@ namespace KBS
         private bool isCombat = false;
 
         public bool IsArmed { get; private set; } = false;
+        private bool isArmed = false;
 
         [Header("Character Stat")]
         public float maxHP = 1000f;
@@ -218,7 +219,7 @@ namespace KBS
         }
         public void Fire()
         {
-            if (IsCombat || IsReloading)
+            if (IsCombat || IsReloading || !IsArmed)
                 return;
 
             if (isAiming)
@@ -239,7 +240,7 @@ namespace KBS
 
         public void Reload()
         {
-            if (IsReloading || IsCombat)
+            if (IsReloading || IsCombat || !IsArmed)
                 return;
             IsReloading = true;
             characterAnimator.SetTrigger("Reload Trigger");
@@ -255,7 +256,7 @@ namespace KBS
 
         public void Combat()
         {
-            if (IsCombat || IsReloading)
+            if (IsCombat || IsReloading || IsArmed)
                 return;
             IsCombat = true;
             characterAnimator.SetTrigger("Combat Trigger");
