@@ -49,6 +49,9 @@ namespace KBS
             InputManager.Singleton.OnCombat += ExecuteCombat;
             InputManager.Singleton.OnHolster += ExecuteHolster;
             InputManager.Singleton.OnPrimaryWeapon += ExecuteEquipPrimaryWeapon;
+            InputManager.Singleton.OnJump += ExecuteJump;
+            InputManager.Singleton.OnRoll += ExecuteRoll;
+
             OnFired(characterBase.primaryWeapon.RemainAmmo, characterBase.primaryWeapon.MaxAmmo);
         }
 
@@ -58,6 +61,10 @@ namespace KBS
             InputManager.Singleton.OnCrouch -= ToggleCrouch;
             InputManager.Singleton.OnReload -= ExecuteReload;
             InputManager.Singleton.OnCombat -= ExecuteCombat;
+            InputManager.Singleton.OnHolster -= ExecuteHolster;
+            InputManager.Singleton.OnPrimaryWeapon -= ExecuteEquipPrimaryWeapon;
+            InputManager.Singleton.OnJump -= ExecuteJump;
+            InputManager.Singleton.OnRoll -= ExecuteRoll;
         }
 
         private void OnEnable()
@@ -198,6 +205,16 @@ namespace KBS
         void ExecuteEquipPrimaryWeapon()
         {
             characterBase.EquipWeapon();
+        }
+
+        void ExecuteJump()
+        {
+            characterBase.Jump();
+        }
+
+        void ExecuteRoll()
+        {
+            characterBase.Roll();
         }
 
 

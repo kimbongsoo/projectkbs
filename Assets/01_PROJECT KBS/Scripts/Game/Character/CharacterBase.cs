@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.Animations.Rigging;
 
 namespace KBS
@@ -76,6 +77,21 @@ namespace KBS
         public float terminalVelocity = 50f;
         public float gravity = -15f;
 
+        [Header("Jump")]
+        public float jumpHeight = 1.2f;
+        public float jumpTimeout = 0.3f;
+        public float fallTimeout = 0.15f;
+        private float jumpTimeoutDelta;
+        private float fallTimeoutDelta;
+
+        [Header("Rolling")]
+        private bool isRolling = false;
+        public float rollingSpeed = 5f;
+        public AnimationCurve rollingCurve;
+        private float rollingTime = 0f;
+        private float rollingDuration = 1.5f;
+
+
         public System.Action<int, int> onFireEvent;
         public System.Action<int, int> onReloadCompleteEvent;
         public System.Action<float, float> OnchangedHP; //체력이 바뀔 떄 호출되는 Event
@@ -86,6 +102,8 @@ namespace KBS
         {
             characterAnimator = GetComponent<Animator>();
             unityCharacterController = GetComponent<UnityEngine.CharacterController>();
+            RollingStateMachineBehaviour rollingStateMachine = characterAnimator.GetBehaviour<RollingStateMachineBehaviour>();
+            rollingStateMachine.Initialize(this);
         }
 
         private void Start()
@@ -99,6 +117,7 @@ namespace KBS
 
         private void Update()
         {
+            FreeFall();
             JumpAndGravity();
             CheckGround();
 
@@ -134,6 +153,15 @@ namespace KBS
 
             aimingRig.weight = IsArmed && isAiming ? 1f : 0f;
             leftHandIk.weight = IsArmed && IsReloading ? 0f : 1f;
+
+            if (isRolling)
+            {
+                rollingTime = Time.deltaTime;
+                float t = rollingTime / rollingDuration;
+                float speedRate = rollingCurve.Evaluate(t);
+                unityCharacterController.Move(transform.forward * rollingSpeed * speedRate * Time.deltaTime);
+
+            }
 
         }
 
@@ -297,7 +325,7 @@ namespace KBS
         public void CheckGround()
         {
             Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - groundOffset, transform.position.z);
-            isGrounded = Physics.CheckSphere(transform.position, groundCheckRadius, groundLayer, QueryTriggerInteraction.Ignore);
+            isGrounded = Physics.CheckSphere(spherePosition, groundCheckRadius, groundLayer, QueryTriggerInteraction.Ignore);
             characterAnimator.SetBool("IsGrounded", isGrounded);
         }
 
@@ -305,19 +333,70 @@ namespace KBS
         {
             if (isGrounded)
             {
-                verticalVelocity = -2f;
-            }
-            else //점프관련 코드
-            {
-                // verticalVelocity = Mathf.Sqrt(2f * gravity);
-                verticalVelocity = (-9.81f * Time.deltaTime);
-            }
+                if (verticalVelocity < 0f)
+                    verticalVelocity = -2f;
 
-            if (verticalVelocity < terminalVelocity)
-            {
-                verticalVelocity += (gravity * Time.deltaTime);
+                if (jumpTimeoutDelta >= 0f)
+                {
+                    jumpTimeoutDelta -= Time.deltaTime;
+                }
+                else
+                {
+                    if (verticalVelocity < terminalVelocity)
+                    {
+                        verticalVelocity += gravity * Time.deltaTime;
+                    }
+                }
             }
+        }
 
+        public void FreeFall()
+        {
+            if (isGrounded)
+            {
+                fallTimeoutDelta = fallTimeout;
+                characterAnimator.SetBool("IsFalling", false);
+            }
+            else
+            {
+                if (fallTimeoutDelta >= 0f)
+                {
+                    fallTimeoutDelta -= Time.deltaTime;
+                }
+                else
+                {
+                    if (false == characterAnimator.GetBool("IsFalling"))
+                    {
+                        characterAnimator.SetBool("IsFalling", true);
+                    }
+                }
+            }
+        }
+
+        public void Jump()
+        {
+            if (isGrounded)
+            {
+                isGrounded = false;
+                verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
+                jumpTimeoutDelta = jumpTimeout;
+                characterAnimator.SetTrigger("Jump Trigger");
+            }
+        }
+
+        public void Roll()
+        {
+            if (isRolling)
+                return;
+
+            isRolling = true;
+            rollingTime = 0f;
+            characterAnimator.SetTrigger("Roll Trigger");
+        }
+
+        public void RollingComplete()
+        {
+            isRolling = false;
         }
     }
 }

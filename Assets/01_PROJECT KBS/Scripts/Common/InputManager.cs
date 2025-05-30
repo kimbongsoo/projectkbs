@@ -22,7 +22,12 @@ namespace KBS
         public event System.Action OnCombat;
         public event System.Action OnHolster;
         public event System.Action OnPrimaryWeapon;
+        public event System.Action OnJump;
+        public event System.Action OnRoll;
 
+        private bool isSpaceTab;
+        private float spaceLastTabTime;
+        private float spaceDoubleTabThreshold = 0.25f;
 
         private void Start()
         {
@@ -72,6 +77,25 @@ namespace KBS
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
                 OnPrimaryWeapon?.Invoke();
+            }
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                // OnJump?.Invoke();
+                if (isSpaceTab && Time.time - spaceLastTabTime <= spaceDoubleTabThreshold)
+                {
+                    OnRoll?.Invoke();
+                    isSpaceTab = false;
+                }
+                else
+                {
+                    // OnJump?.Invoke();
+                    isSpaceTab = true;
+                    spaceLastTabTime = Time.time;
+                }
+            }
+            if (isSpaceTab && (Time.time - spaceLastTabTime) > spaceDoubleTabThreshold)
+            {
+                isSpaceTab = false;
             }
         }
         
