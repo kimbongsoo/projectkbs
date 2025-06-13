@@ -13,6 +13,7 @@ namespace KBS
     {
         public static CharacterPlayerController Instance { get; private set; } = null;
         private CharacterBase characterBase;
+        private InteractionSensor interactionSensor;
 
         [Header("Camera Setting")]
         public Transform cameraPivot;
@@ -39,6 +40,10 @@ namespace KBS
         {
             characterBase = GetComponent<CharacterBase>();
             Instance = this;
+
+            GameObject sensorObject = new GameObject("Interaction Sensor");
+            sensorObject.transform.SetParent(transform);
+            interactionSensor = sensorObject.AddComponent<InteractionSensor>();
         }
 
         private void Start()
