@@ -104,6 +104,9 @@ namespace KBS
             unityCharacterController = GetComponent<UnityEngine.CharacterController>();
             RollingStateMachineBehaviour rollingStateMachine = characterAnimator.GetBehaviour<RollingStateMachineBehaviour>();
             rollingStateMachine.Initialize(this);
+
+            UnarmedStateMachineBehaviour unarmedStateMachine = characterAnimator.GetBehaviour<UnarmedStateMachineBehaviour>();
+            unarmedStateMachine.Initialize(this);
         }
 
         private void Start()
@@ -211,7 +214,7 @@ namespace KBS
 
         public void Move(Vector2 input, float yAxisAngle)
         {
-            if (IsCombat)
+            if (IsCombat || isRolling)
                 return;
             characterAnimator.SetFloat("Magnitude", input.magnitude);
             Vector3 movement = Vector3.zero;
@@ -268,11 +271,12 @@ namespace KBS
 
         public void Reload()
         {
-            if (IsReloading || IsCombat || !IsArmed)
+            if (IsReloading || IsCombat || !IsArmed || isRolling)
                 return;
             IsReloading = true;
             characterAnimator.SetTrigger("Reload Trigger");
             leftHandIk.weight = 0f;
+            characterAnimator.SetLayerWeight(2, 0);
         }
 
         public void ReloadComplete()
@@ -280,6 +284,7 @@ namespace KBS
             IsReloading = false;
             int fullAmmo = primaryWeapon.SetFullAmmo();
             onReloadCompleteEvent?.Invoke(fullAmmo, fullAmmo);
+            characterAnimator.SetLayerWeight(2, 1);
         }
 
         public void Combat()
@@ -298,13 +303,17 @@ namespace KBS
         public void EquipWeapon()
         {
             characterAnimator.SetTrigger("Equip Trigger");
+            characterAnimator.SetFloat("IsEquip", 1f);
             IsArmed = true;
+            characterAnimator.SetLayerWeight(2, 1f);
         }
 
         public void HolsterWeapon()
         {
             characterAnimator.SetTrigger("Holster Trigger");
+            characterAnimator.SetFloat("IsEquip", 0f);
             IsArmed = false;
+            // characterAnimator.SetLayerWeight(2, 0f);
         }
 
         public void OnWeaponToEquipPlace()
@@ -392,11 +401,15 @@ namespace KBS
             isRolling = true;
             rollingTime = 0f;
             characterAnimator.SetTrigger("Roll Trigger");
+            characterAnimator.SetLayerWeight(1, 0);
+            characterAnimator.SetLayerWeight(2, 0);
         }
 
         public void RollingComplete()
         {
             isRolling = false;
+            characterAnimator.SetLayerWeight(1, 1);
+            characterAnimator.SetLayerWeight(2, 1);
         }
     }
 }
