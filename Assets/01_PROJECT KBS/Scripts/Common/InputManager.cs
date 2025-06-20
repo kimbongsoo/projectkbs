@@ -25,6 +25,9 @@ namespace KBS
         public event System.Action OnJump;
         public event System.Action OnRoll;
 
+
+        public event System.Action OnInteract;
+
         private bool isSpaceTab;
         private float spaceLastTabTime;
         private float spaceDoubleTabThreshold = 0.25f;
@@ -54,10 +57,14 @@ namespace KBS
             isLeftShift = Input.GetKey(KeyCode.LeftShift);
             isRightMouseButton = Input.GetMouseButton(1);
 
-            if (Input.GetKeyDown(KeyCode.Tab))
+            if (Input.GetKeyDown(KeyCode.F))
             {
-                OnTab?.Invoke();
+                OnInteract?.Invoke();
             }
+            if (Input.GetKeyDown(KeyCode.Tab))
+                {
+                    OnTab?.Invoke();
+                }
             if (Input.GetKeyDown(KeyCode.C))
             {
                 OnCrouch?.Invoke();

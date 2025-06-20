@@ -43,6 +43,7 @@ namespace KBS
             {
                 UIManager.Show<MainHUD>(UIList.MainHUD);
                 UIManager.Show<CrossHairUI>(UIList.CrossHairUI);
+                UIManager.Show<InteractionUI>(UIList.InteractionUI);
             }
         }
 

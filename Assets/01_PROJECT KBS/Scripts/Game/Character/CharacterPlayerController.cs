@@ -57,6 +57,8 @@ namespace KBS
             InputManager.Singleton.OnJump += ExecuteJump;
             InputManager.Singleton.OnRoll += ExecuteRoll;
 
+            InputManager.Singleton.OnInteract += ExecuteInteract;
+
             OnFired(characterBase.primaryWeapon.RemainAmmo, characterBase.primaryWeapon.MaxAmmo);
         }
 
@@ -70,6 +72,8 @@ namespace KBS
             InputManager.Singleton.OnPrimaryWeapon -= ExecuteEquipPrimaryWeapon;
             InputManager.Singleton.OnJump -= ExecuteJump;
             InputManager.Singleton.OnRoll -= ExecuteRoll;
+
+            InputManager.Singleton.OnInteract -= ExecuteInteract;
         }
 
         private void OnEnable()
@@ -220,6 +224,13 @@ namespace KBS
         void ExecuteRoll()
         {
             characterBase.Roll();
+        }
+
+        void ExecuteInteract()
+        {
+            var interactionUI = UIManager.Singleton.GetUI<InteractionUI>(UIList.InteractionUI);
+            interactionUI.TryInteract();
+            
         }
 
 

@@ -36,8 +36,12 @@ namespace KBS
             IInteractionProvider interactionProvider = other.GetComponent<IInteractionProvider>();
             if (interactionProvider != null)
             {
-                // TODO : 상호작용 UI에서 해당 항목을 추가
-                Debug.Log($"Detect Provider!! : {other.gameObject.name}");
+                var interactionUI = UIManager.Singleton.GetUI<InteractionUI>(UIList.InteractionUI);
+                foreach (var data in interactionProvider.Interactions)
+                {
+                    var context = new InteractionDataContext(data, interactionProvider);
+                    interactionUI.AddInteractionData(context);
+                }
             }
         }
 
@@ -46,9 +50,13 @@ namespace KBS
             IInteractionProvider interactionProvider = other.GetComponent<IInteractionProvider>();
             if (interactionProvider != null)
             {
-                // TODO : 상호작용 UI에서 해당 항목을 제거
-                Debug.Log($"Lost Provider Object!! : {other.gameObject.name}");
-            }   
+                var interactionUI = UIManager.Singleton.GetUI<InteractionUI>(UIList.InteractionUI);
+                foreach (var data in interactionProvider.Interactions)
+                {
+                    var context = new InteractionDataContext(data, interactionProvider);
+                    interactionUI.RemoveInteractionData(context);
+                }
+            } 
         }
     }
 }

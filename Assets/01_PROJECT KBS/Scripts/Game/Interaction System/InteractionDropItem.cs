@@ -16,13 +16,18 @@ namespace KBS
 
         public void Initialize(InteractionDropItemData itemData)
         {
-            int index = Mathf.Clamp(itemData.ItemGrade - 1, 0, itemGradeMaterials.Length -1);
+            interactionDatas.Add(itemData);
+
+            int index = Mathf.Clamp(itemData.ItemGrade - 1, 0, itemGradeMaterials.Length - 1);
             visualRenderer.material = itemGradeMaterials[index];
         }
 
         public void Interact(IInteractionData data)
         {
+            //TODO : 아이템 획득 처리
+            //TODO : 인벤토리에 추가
 
+            Destroy(gameObject);
         }
     }
 }

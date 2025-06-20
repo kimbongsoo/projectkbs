@@ -6,6 +6,8 @@ namespace KBS
 {
     public interface IInteractionData
     {
-
+        public string ID { get; }
+        public Sprite ActionIcon { get; }
+        public string ActionMessage { get; }
     }
 }

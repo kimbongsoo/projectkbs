@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dce7b0244a91c49c7b2ab8ec6669582d, type: 3}
   m_Name: InteractionDropItemData (melon)
   m_EditorClassIdentifier: 
+  itemId: ITEM_05
   itemIcon: {fileID: 21300000, guid: c697be02b201eae45924afffb572afa2, type: 3}
-  itemName: "\uBA54\uB860"
+  itemName: melon
   itemGrade: 5

@@ -28,6 +28,7 @@ namespace KBS
         CrossHairUI,
         TitleUI,
         MainHUD,
+        InteractionUI,
 
         MAX_SCENE_PANEL,
         //===================

@@ -15,6 +15,7 @@ namespace KBS
             // TODO : Show Ingame Scene UI
             UIManager.Show<MainHUD>(UIList.MainHUD);
             UIManager.Show<CrossHairUI>(UIList.CrossHairUI);
+            UIManager.Show<InteractionUI>(UIList.InteractionUI);
 
             yield return null;
         }
@@ -27,6 +28,7 @@ namespace KBS
             // TODO : Hide Ingame Scene UI
             UIManager.Hide<MainHUD>(UIList.MainHUD);
             UIManager.Hide<CrossHairUI>(UIList.CrossHairUI);
+            UIManager.Hide<InteractionUI>(UIList.InteractionUI);
 
         }
 
