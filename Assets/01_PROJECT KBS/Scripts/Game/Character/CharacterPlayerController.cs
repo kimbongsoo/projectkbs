@@ -12,6 +12,8 @@ namespace KBS
     public class CharacterPlayerController : MonoBehaviour
     {
         public static CharacterPlayerController Instance { get; private set; } = null;
+
+        public InteractionSensor InteractionSensor => interactionSensor;
         private CharacterBase characterBase;
         private InteractionSensor interactionSensor;
 

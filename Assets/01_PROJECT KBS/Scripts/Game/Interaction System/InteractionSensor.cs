@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 namespace KBS
@@ -28,7 +29,22 @@ namespace KBS
         // 수동으로 센서 기능을 한번 실행해보는 함수
         public void PulseManually()
         {
+            var interactionUI = UIManager.Singleton.GetUI<InteractionUI>(UIList.InteractionUI);
+            interactionUI.ClearData();
+
             int overlappedCount = Physics.OverlapSphereNonAlloc(transform.position, sensorRadius, overlappedByPulse);
+            for (int i = 0; i < overlappedCount; i++)
+            {
+                if (overlappedByPulse[i].TryGetComponent<IInteractionProvider>(out var provider))
+                {
+                    foreach (var data in provider.Interactions)
+                    {
+                        var context = new InteractionDataContext(data, provider);
+                        interactionUI.AddInteractionData(context);
+                    }
+                }
+            }
+
         }
 
         private void OnTriggerEnter(Collider other)
