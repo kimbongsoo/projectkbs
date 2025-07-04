@@ -53,7 +53,6 @@ namespace KBS
             InputManager.Singleton.OnTab += CameraTab;
             InputManager.Singleton.OnCrouch += ToggleCrouch;
             InputManager.Singleton.OnReload += ExecuteReload;
-            InputManager.Singleton.OnCombat += ExecuteCombat;
             InputManager.Singleton.OnHolster += ExecuteHolster;
             InputManager.Singleton.OnPrimaryWeapon += ExecuteEquipPrimaryWeapon;
             InputManager.Singleton.OnJump += ExecuteJump;
@@ -69,7 +68,6 @@ namespace KBS
             InputManager.Singleton.OnTab -= CameraTab;
             InputManager.Singleton.OnCrouch -= ToggleCrouch;
             InputManager.Singleton.OnReload -= ExecuteReload;
-            InputManager.Singleton.OnCombat -= ExecuteCombat;
             InputManager.Singleton.OnHolster -= ExecuteHolster;
             InputManager.Singleton.OnPrimaryWeapon -= ExecuteEquipPrimaryWeapon;
             InputManager.Singleton.OnJump -= ExecuteJump;
@@ -203,10 +201,6 @@ namespace KBS
             characterBase.Reload();
         }
 
-        void ExecuteCombat()
-        {
-            characterBase.Combat();
-        }
 
         void ExecuteHolster()
         {

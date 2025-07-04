@@ -7,9 +7,10 @@ namespace KBS
 {
     public class AIController : MonoBehaviour
     {
-        public Transform destinationPoint; //임시 목적지 변수
         private CharacterBase characterBase;
         private NavMeshAgent navAgent;
+
+        public event System.Action OnDestinationReached;
 
         private void Awake()
         {
@@ -27,20 +28,61 @@ namespace KBS
 
         private void Update()
         {
-            navAgent.SetDestination(destinationPoint.position); // NavMeshAgent의 위치를 캐릭터의 위치로 설정
             navAgent.nextPosition = transform.position;
 
-            if (navAgent.hasPath)
+            if (navAgent.hasPath && !navAgent.pathPending)
             {
                 Vector3 moveDirection = (navAgent.steeringTarget - transform.position).normalized; // 목적지 방향 계산
                 Vector2 input = new Vector2(moveDirection.x, moveDirection.z); // 2D 입력 벡터 생성
 
                 characterBase.Move(input, 0); // 캐릭터 이동
+
+                // 목적지에 도착했는지 판단
+                if (navAgent.remainingDistance <= navAgent.stoppingDistance)
+                {
+                    navAgent.isStopped = true;
+                    navAgent.ResetPath();
+                    OnDestinationReached?.Invoke();
+                }
             }
             else
             {
                 characterBase.Move(Vector2.zero, 0);
             }
+        }
+
+        public void SetDestination(Vector3 destination)
+        {
+            navAgent.isStopped = false;
+            navAgent.SetDestination(destination);
+        }
+
+        public void Stop()
+        {
+            navAgent.isStopped = true;
+            navAgent.ResetPath();
+        }
+
+        public void EquipWeapon()
+        {
+            characterBase.EquipWeapon();
+            characterBase.IsAiming = true;
+        }
+
+        public void UnequipWeapon()
+        {
+            characterBase.HolsterWeapon();
+            characterBase.IsAiming = false;
+        }
+
+        public void SetAiming(Vector3 aimingPoint)
+        {
+            characterBase.AimingPoint = aimingPoint;
+        }
+
+        public void Fire()
+        {
+            characterBase.Fire();
         }
     }
 

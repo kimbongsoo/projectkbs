@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Animations.Rigging;
+using UnityEngine.XR;
 
 namespace KBS
 {
@@ -27,9 +28,6 @@ namespace KBS
 
         public bool IsReloading { get; private set; } = false;
         private bool isAiming = false;
-
-        public bool IsCombat { get; private set; } = false;
-        private bool isCombat = false;
 
         public bool IsArmed { get; private set; } = false;
         private bool isArmed = false;
@@ -200,8 +198,6 @@ namespace KBS
 
         public void Rotate(Vector3 targetPoint)
         {
-            if (IsCombat)
-                return;
             if (isAiming)
             {
                 Vector3 target = targetPoint;
@@ -214,7 +210,7 @@ namespace KBS
 
         public void Move(Vector2 input, float yAxisAngle)
         {
-            if (IsCombat || isRolling)
+            if (isRolling)
                 return;
             characterAnimator.SetFloat("Magnitude", input.magnitude);
             Vector3 movement = Vector3.zero;
@@ -250,7 +246,7 @@ namespace KBS
         }
         public void Fire()
         {
-            if (IsCombat || IsReloading || !IsArmed)
+            if (IsReloading || !IsArmed)
                 return;
 
             if (isAiming)
@@ -271,7 +267,7 @@ namespace KBS
 
         public void Reload()
         {
-            if (IsReloading || IsCombat || !IsArmed || isRolling)
+            if (IsReloading || !IsArmed || isRolling)
                 return;
             IsReloading = true;
             characterAnimator.SetTrigger("Reload Trigger");
@@ -287,18 +283,6 @@ namespace KBS
             characterAnimator.SetLayerWeight(2, 1);
         }
 
-        public void Combat()
-        {
-            if (IsCombat || IsReloading || IsArmed)
-                return;
-            IsCombat = true;
-            characterAnimator.SetTrigger("Combat Trigger");
-        }
-
-        public void CombatComplete()
-        {
-            IsCombat = false;
-        }
 
         public void EquipWeapon()
         {
@@ -410,6 +394,11 @@ namespace KBS
             isRolling = false;
             characterAnimator.SetLayerWeight(1, 1);
             characterAnimator.SetLayerWeight(2, 1);
+        }
+
+        public Transform GetAvatarBoneTransform(HumanBodyBones bone)
+        {
+            return characterAnimator.GetBoneTransform(bone);
         }
     }
 }
